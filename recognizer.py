@@ -5,6 +5,7 @@ import numpy as np
 import math
 from sklearn.preprocessing import StandardScaler
 from scipy.signal import resample
+from templates import Templates
 
 """ 01
 - implement Wobbrock's $1 gesture recognizer
@@ -12,9 +13,9 @@ from scipy.signal import resample
 - build interface for user to enter gestures to test recognizer (gesture-input.py)
 
 - [ ] (2P) $1 gesture recognizer works.
-- [ ] (1P) Efficient implementation.
+- [x] (1P) Efficient implementation.
 - [ ] (1P) Five gestures can be distinguished.
-- [ ] (1P) Gesture entry user interface (gesture-input.py)
+- [x] (1P) Gesture entry user interface (gesture-input.py)
 """
 
 TEST_PATH = "dataset/test"
@@ -22,14 +23,22 @@ TEMPLATE_PATH = "dataset/templates"
 NUM_POINTS = 64
 
 class Parser:
+    """via: lstm_demo.ipynb"""
+
+    def parse_template(list):
+        data = []
+        for el in list:
+            # print(el)
+            label, points = el
+            data.append(Parser.resample_path(label, points))
+        return data
     
     def parse_xml_files(folderpath:str):
         data = []
 
         for root, subdirs, files in os.walk(folderpath):
-
-            if 'ipynb_checkpoint' in root:
-                continue
+            # if 'ipynb_checkpoint' in root:
+            #     continue
 
             if len(files) > 0:
                 for f in files:
@@ -72,6 +81,8 @@ class Rect:
 
 
 class Recognizer:
+    """via: https://depts.washington.edu/acelab/proj/dollar/index.html"""
+    
     def __init__(self) -> None:
         self.phi = 0.5 * (-1.0 + math.sqrt(5.0)) # golden ratio
         self.angle_range = 45
@@ -79,6 +90,11 @@ class Recognizer:
         self.square_size = 250
         self.diagonal = math.sqrt(self.square_size * self.square_size + self.square_size * self.square_size)
         self.half_diagonal = 0.5 * self.diagonal
+        self.origin = [0, 0]
+
+    def load_templates(self):
+        # TODO: load better templates
+        return Parser.parse_xml_files(TEMPLATE_PATH)
 
     # STEP 2
     def get_centroid(self, points):
@@ -126,12 +142,13 @@ class Recognizer:
     def translate_to(self, points, pt):
         cx, cy = self.get_centroid(points)
         new_points = []
-        for i in range(0, len(0, len(points))):
+        for i in range(0, len(points)):
             qx = points[i][0] * pt[0] - cx
             qy = points[i][1] * pt[1] - cy 
             new_points.append([qx, qy])
         return new_points
 
+    # STEP 4
     def distance_at_best_angle(self, points, T, a, b, threshold):
         x1 = self.phi * a + (1.0 - self.phi) * b
         f1 = self.distance_at_angle(points, T, x1)
@@ -167,25 +184,46 @@ class Recognizer:
         dx = p2[0] - p1[0]
         dy = p2[1] - p1[1]
         return math.sqrt(dx * dx + dy * dy)
+    
+    def preprocess(self, points): # create a "Unistroke"
+        # NOTE: resampleing already done during parsing
+        radians = self.get_indicative_angle(points)
+        points = self.rotate_by(points, -radians)
+        points = self.scale_to(points, self.square_size)
+        points = self.translate_to(points, self.origin)
+        # Vectorize??
+        return points
 
-    def recognize(self, points, templates):
+    # THE RECOGNIZER
+    def recognize(self, points, templates=None) -> tuple[str, float]:
         b = np.inf
 
+        points = self.preprocess(points) # pre
+
         result = "no_match"
+        score = 0
+
+        if templates == None:
+            templates = self.load_templates()
+
         for template in templates:
             t_label, t_points = template[0]
+            t_points = self.preprocess(t_points) # pre # TODO (move out to Parser -> do only once)
             
             d = self.distance_at_best_angle(points, t_points, -self.angle_range, +self.angle_range, self.angle_precision)
             if d < b:
                 b = d
                 result = t_label
                 score = 1.0 - b / self.half_diagonal
+                print(result, score)
             
         return (result, score)
-
+    
 
 def test_gestures():
-    templates = Parser.parse_xml_files(TEMPLATE_PATH)
+    # templates = Parser.parse_xml_files(TEMPLATE_PATH)
+    t = Templates()
+    templates =  Parser.parse_template(t.gestures)
     tests = Parser.parse_xml_files(TEST_PATH)
     recognizer = Recognizer()
 
