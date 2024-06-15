@@ -91,7 +91,6 @@ class Area:
         
     def set_gesture_label(self, gesture:str):
         self.gesture.text = gesture
-    # TODO: add corner "pieces" ?? -> like this: L
 
 
 class Menu:
@@ -113,7 +112,6 @@ class Menu:
         self.items.append(separator)
 
         self.create_gesture_info()
-        # self.create_gesture_lines()
 
     def create_gesture_info(self):
         off = 100
@@ -132,8 +130,6 @@ class Menu:
                                 anchor_x="center", batch=self.batch)
         self.labels.append(l)
 
-
-    # TODO: create a info menu on what gestures you can draw
     def create_gesture_lines(self, points, off):
         """Create a line following a gesture"""
         for i in range(0, len(points)-1):
@@ -146,18 +142,6 @@ class Menu:
             l = pyglet.shapes.Line(x1, y1, x2, y2, width=RADIUS, 
                                 color=SEP_COL, batch=self.batch)
             self.lines.append(l)
-
-    # TODO:
-    def create_connect_line(self, points):
-            """Create a line to connect the last two points: p1---p2"""
-            p1 = points[-2]
-            p2 = points[-1]
-            print(p1)
-            l = pyglet.shapes.Line(p1[0], p1[1], p2[0], p2[1], width=RADIUS, 
-                                color=COLOR, batch=self.batch)
-            # self.line.append(l)
-            pass
-
 
 
 # ----- INIT ----- #
