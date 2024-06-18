@@ -1,1 +1,7 @@
 .venv
+dataset/01-test
+dataset/test
+dataset/templates
+dataset/xml_logs
+logs/*.json
+

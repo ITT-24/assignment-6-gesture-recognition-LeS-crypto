@@ -1,20 +1,24 @@
 from recognizer import Parser, Recognizer
 from templates import Templates
 import pyglet
+import pandas as pd
+import numpy as np
 # gesture input program for first task
 
-""" 01
-- build interface for user to enter gestures to test recognizer
-- [x] (1P) Gesture entry user interface
-"""
 MENU_WIDTH = 200
 WIDTH = 700 + MENU_WIDTH
 HEIGHT = 700
 window = pyglet.window.Window(WIDTH, HEIGHT)
 
-# ----- HELPERS ----- #
 RADIUS = 2
 COLOR = (196, 183, 203)
+
+TEMPLATE_PATH = "dataset/templates"
+MENU_BG = (206, 196, 212) # (216, 208, 221) # (196, 183, 203) # little darker
+SEP_COL = (94, 86, 90)
+Y_OFFSET = 15
+
+# ----- HELPERS ----- #
 
 class Path:
     def __init__(self) -> None:
@@ -31,6 +35,8 @@ class Path:
         # self.templates = Parser.resample_path("star", self.t.star)
 
         # self.templates = Parser.parse_xml_files(TEMPLATE_PATH)
+        self.i = 1
+        self.name = "x"
     
     def add_point(self, x, y):
         p = [x, y]
@@ -58,12 +64,20 @@ class Path:
                                color=COLOR, batch=self.batch)
         self.line.append(l)
         pass
-
     
     def recognize_gesture(self):
         """Use the $1 recognizer on the path"""
+
         print(f"Recognizing the gesture...\t -> {len(self.path)}")
         _, points = Parser.resample_path("none", self.path)[0]
+
+        # df = pd.DataFrame(np.array(self.path), columns=["x", "y"])
+        # # print(df.head())
+
+        # path = f"dataset/test-own/{self.name}-{self.i}.csv"
+        # df.to_csv(path, mode="w")
+        # print(self.i)
+        # self.i += 1
 
         result, score = self.reco.recognize(points, self.templates)
         area.set_gesture_label(f"{result}, {score} ")
@@ -74,11 +88,6 @@ class Path:
         self.line = []
         area.set_gesture_label("...")
 
-
-TEMPLATE_PATH = "dataset/templates"
-MENU_BG = (206, 196, 212) # (216, 208, 221) # (196, 183, 203) # little darker
-SEP_COL = (94, 86, 90)
-Y_OFFSET = 15
 
 class Area:
     def __init__(self):
@@ -172,7 +181,6 @@ def on_mouse_press(x, y, button, modifiers):
     """Start "tracking" the gesture being drawn"""
     if button == pyglet.window.mouse.LEFT:
         path.reset()
-    # ??: get better/more points
 
 
 @window.event
