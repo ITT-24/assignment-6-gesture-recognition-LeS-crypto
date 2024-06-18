@@ -5,18 +5,7 @@ import numpy as np
 import math
 from sklearn.preprocessing import StandardScaler
 from scipy.signal import resample
-from templates import Templates
-
-""" 01
-- implement Wobbrock's $1 gesture recognizer
-- Train with at least five gestures
-- build interface for user to enter gestures to test recognizer (gesture-input.py)
-
-- [x] (2P) $1 gesture recognizer works.
-- [x] (1P) Efficient implementation.
-- [ ] (1P) Five gestures can be distinguished.
-- [x] (1P) Gesture entry user interface (gesture-input.py)
-"""
+from templates import Templates # TODO update to use this instead of TEMPLATE_APTH
 
 TEST_PATH = "dataset/test"
 TEMPLATE_PATH = "dataset/templates"
