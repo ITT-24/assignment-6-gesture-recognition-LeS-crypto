@@ -22,7 +22,7 @@ import os
 """
 
 """
-'Draw' music: (half inspired by https://typatone.com/)
+'Draw' music: (loosely inspired by https://typatone.com/)
 """
 MENU_WIDTH = 200
 SONG_HEIGHT = 100
