@@ -10,20 +10,8 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from scipy.signal import resample
 import os
 # application for task 3
+# 'Draw' music: (loosely inspired by https://typatone.com/)
 
-"""03
-- very simple 2D application (game, controller, quick start menu)
-- program is controlled with gestures drawn by user
-- support at least 3 distinct gestures
-
-- [x] (1P) Gesture input works.
-- [ ] (2P) Functionality and aesthetics of the application.
-- [x] (2P) Three gestures are distinguished robustly.
-"""
-
-"""
-'Draw' music: (loosely inspired by https://typatone.com/)
-"""
 MENU_WIDTH = 200
 SONG_HEIGHT = 100
 WIDTH = 700 + MENU_WIDTH
@@ -215,9 +203,7 @@ class Menu:
 
 
     def create_gesture_info(self, templates):
-        # TODO update
         off = 100
-        idx = 1
         for template in templates:
             label, path = template
             self.create_label(label, off )
@@ -261,20 +247,14 @@ class Tone:
 
     def play_tone(prediction:int)-> bool:
         match(prediction):
-            case 1: # v / check
+            case 1: 
                 Tone.v_wave()
-            case 4: # pigtail
+            case 4:
                 Tone.pig_wave()
-            case 7: # delete
-                pass
-            case 8: # circle
+            case 8: 
                 Tone.circle_wave()
-            case 11: # x
-                pass
-            case 12: # star
+            case 12:
                 Tone.star_wave()
-            case 14: # caret/arrow
-                pass
             case _:
                 print("oops")
                 Tone.oops_wave()
@@ -341,8 +321,6 @@ class Tone:
         sleep(1)
         wave.stop()
 
-# TODO: show labels
-
 
 # ----- INIT ----- #
 
@@ -350,7 +328,6 @@ path = Path()
 menu = Menu()
 area = Area()
 song = SongDisplay()
-
 
 # ----- WINDOW INTERACTION ----- #
 
@@ -395,6 +372,7 @@ def on_mouse_drag(x, y, dx, dy, buttons, modifiers):
     """ Sample points from the drawing. dx/dy = distance traveled from last point"""
     if buttons & pyglet.window.mouse.LEFT:
         path.add_point(x, y)
+
 
 # ----- RUN APP ----- #
 
